@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/alanshaw/evaluactor"
 	"github.com/filecoin-project/go-address"
@@ -21,26 +22,16 @@ import (
 
 var rootCID cid.Cid
 var zeroState string
-
-const luaScript = `
---[[ function returning the max between two numbers --]]
-function max(num1, num2)
-   if (num1 > num2) then
-      result = num1;
-   else
-      result = num2;
-   end
-   return result; 
-end
-
-biggest = max(3, 6)
-
-fil.setresult(tostring(biggest))
-`
+var luaSrc string
 
 func init() {
 	rootCID, _ = cid.Decode("bafy2bzacebyvb3cairrciekiwmyzccp72dy46r4d5jua5q233jy4a36mg6c2c")
 	zeroState = "H4sIAAAAAAAA/0pflFqUn19S3HRDK0KdgbFwwRMmhcKANw4uSSqCHpsNJ3L+v/DxvHvzqwy+w9G3Cg/knzFvXUiC0vSy1KLizPw8xu1sxGlocmnx4WbsXJho2NjkxJDYckPLn4ExlIErLTNH31A/tSwxB8l21w3nDymcexNdI5N05IqkrcWT10v6OkSL5jyPn8O14cnBAwwOUHPYWm5oRUiDDBKDGFSWWpSZlpmaUpSanllcUlSJZCjHzaQtxRJCRV+mHdESdfsreGr1M8v9e/fZnjo/wXrr6jaEoSwtN7TCQWYKQcwsLskvSkxPLcgvTy1CMo9bq21K7dld+YcWrlN4tb4v5eAW+YdTBY+nXH5/3nbVmW+7weY1NTkxMKN5NrkoPw/JnNSLt66nTDpz9YKAZO2h7Ku/2Q+cbz1zZ/0ngZYDV6r/ikcyODQ5MSS33NAKApnBCzEjMTk5vzSvBMmY+64lxzYv3Jl1Ys+GKVum10zW7K3IufD+16ZLz5dcly6fwQX3HkPLDa1AkFE8UO9VFpek5pIT+qyg0JcAGSWMElK5iUXZqchui/qxsdhU9+n67k1W0qxq5i+mCZe9+fHkRlpO9uYFHL2FuXATGdGCKjMvE9mcpWx2s3/P2Fe53PXlZoljW0XeiZ6UPrZX+Gr7Db3m58cqcuDmpBAMrjOqx0pW5IU+sU31fsXEsLVW1t88WkTIyHEZX2z50lVvmRk8GJh765Yca2CAGsmEFmxFqeWJRSlIJkqohcl9ClnGJ/jp5CfeR6LXGF6xid0siSp59vORcEH42WQGXwa2sphK+4UMlRcYGBgkUFM/gqVOXCw0GOBO9dhFGxiJywjNTgwByP76l3UmcfHibB5zGy+rvmXejdqfTs0OagiYMKfiCkdoFw8JSjWJU9bk0KCBPfthiuxlJC43TnCAgqYICQamOzkMWEA4A/MBbOIMDCT4kUGBBMXfJFCLBQTLiLjCoRFUwLCwgjIjpxxGekfhaBFXTjQ6MSTLoJcOyGwtHPkdi9A6JuLyfzdSkD1N7baVOMv28PYE0S0b3oQeVF7kG/3wlcoNS4ujOyyr/fXJU0rFRExKWiBBrYKDg4Mecf5qZmBodmRoaJBALSgRrFTiistmJOd5XXv+vV4xbR9PQXP1in97Njy6OmsVs9ncT4fv3351vfvBeonUguSMxMw83bLEnMyUxJLM/DwP4nQ2OTUwNIIL0VDGzBfGnj4TZbP+6T+0VYzzifnOnhQqkWJLXJHciF2/DHqZjMyuJ65s7nRwYPBkEIDmdi8Gxu/ey60KWa5MboqQAnEWz6q8t8EVvVQIY5SclrVdF13Yk4H/PwQwOAAAAAD//wEAAP//JmyWUIcJAAA="
+	src, err := ioutil.ReadFile("./examples/max.lua")
+	if err != nil {
+		panic(err)
+	}
+	luaSrc = string(src)
 }
 
 func main() {
@@ -69,7 +60,7 @@ func main() {
 	invoker.Register(nil, evaluactor.Actor{})
 	lvm.SetInvoker(invoker)
 
-	params := evaluactor.EvalParams{Script: luaScript}
+	params := evaluactor.EvalParams{Script: luaSrc}
 	var pbuf bytes.Buffer
 	err = params.MarshalCBOR(&pbuf)
 	if err != nil {
@@ -81,7 +72,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("\nLua script:\n%s\n", luaScript)
+	fmt.Printf("\nLua script:\n%s\n", luaSrc)
 
 	msg := types.Message{
 		Version:    0,

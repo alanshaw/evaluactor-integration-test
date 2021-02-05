@@ -1,3 +1,5 @@
+local fil = require("fil")
+
 function fib(n)
   if n == 0 then
     return 0
@@ -7,4 +9,4 @@ function fib(n)
   return fib(n-1) + fib(n-2)
 end
 
-fil.setresult(fib(20))
+fil.set_result(fib(20))

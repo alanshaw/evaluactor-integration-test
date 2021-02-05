@@ -1,3 +1,5 @@
+local fil = require("fil")
+
 --[[ function returning the max between two numbers --]]
 function max(num1, num2)
   if (num1 > num2) then
@@ -10,4 +12,4 @@ end
 
 biggest = max(3, 6)
 
-fil.setresult(biggest)
+fil.set_result(biggest)

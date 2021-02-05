@@ -3,7 +3,7 @@ module github.com/alanshaw/evaluactor-integration-test
 go 1.15
 
 require (
-	github.com/alanshaw/evaluactor v0.0.0-20210203112549-d531cac2439e
+	github.com/alanshaw/evaluactor v0.0.0-20210204150438-1d71ef98ad45
 	github.com/filecoin-project/go-address v0.0.5
 	github.com/filecoin-project/go-state-types v0.0.0-20210119062722-4adba5aaea71
 	github.com/filecoin-project/lotus v1.4.1
